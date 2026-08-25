@@ -5,12 +5,12 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime
 
-# 1. Configuração visual com responsividade otimizada para celular
+# 1. Configuração visual e layout limpo para celular
 st.set_page_config(page_title="Emissão de Pedido", layout="centered")
 st.markdown("""
     <style>
         .stApp {
-            background-color: #FFFFFF; 
+            background-color: #F8F9FA; 
             font-family: 'Bahnschrift', 'Eurostile', sans-serif;
             color: #333333;
         }
@@ -21,36 +21,41 @@ st.markdown("""
             border-radius: 8px;
             margin-bottom: 20px;
             text-align: center;
+            border: 1px solid #EAE3D2;
         }
         .title-box h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 22px;
             color: #2C3338;
+        }
+        /* Card individual para cada produto (organiza o visual no celular) */
+        .produto-card {
+            background-color: #FFFFFF;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+            margin-bottom: 12px;
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.02);
         }
         div[data-testid="stForm"] {
             border: none;
             padding: 0;
+            background: transparent;
         }
-        /* Botão vermelho de destaque */
+        /* Botão vermelho de destaque ocupando toda a largura */
         button[kind="primary"] {
             background-color: #FF4D4D !important;
             border-color: #FF4D4D !important;
             color: white !important;
             font-weight: bold;
             width: 100%;
-        }
-        
-        /* Ajustes específicos para telas de celular */
-        @media (max-width: 768px) {
-            .produto-texto {
-                font-size: 13px !important;
-                margin-bottom: -5px;
-            }
+            padding: 10px;
+            border-radius: 6px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Título responsivo
+# Título
 st.markdown("""
     <div class="title-box">
         <h1>📦 Contagem de Panettone</h1>
@@ -73,21 +78,25 @@ produtos_fixos = [
 # 3. Construção do Formulário
 with st.form("form_pedido"):
     
-    # Cliente e Razão (No celular o Streamlit já empilha automaticamente de forma limpa)
+    # Cabeçalho do Cliente
     cod_cliente = st.text_input("Código do Cliente")
-    razao = st.text_input("Razão Social")
+    razao = st.text_input("Razão Social do Cliente")
         
-    st.write("---")
-    st.markdown("### Produtos")
+    st.markdown("<p style='margin-top: 20px; font-weight: bold; color: #555;'>Itens da Contagem:</p>", unsafe_allow_html=True)
     
     itens_pedido = []
     
     for i, prod in enumerate(produtos_fixos):
-        # Exibe o nome do produto em destaque acima dos campos para otimizar o espaço horizontal no celular
-        st.markdown(f"<div class='produto-texto' style='font-weight: bold; color: #444; margin-top: 10px;'>{prod['cod']} - {prod['desc']}</div>", unsafe_allow_html=True)
+        # Abre um "card" limpo em HTML para cada produto
+        st.markdown(f"""
+            <div class="produto-card">
+                <div style="font-size: 13px; font-weight: bold; color: #222; margin-bottom: 8px;">
+                    {prod['cod']} - {prod['desc']}
+                </div>
+        """, unsafe_allow_html=True)
         
-        # Divide o espaço apenas para Qtd e Unidade ficarem lado a lado abaixo do nome
-        col_qtd, col_unid = st.columns(2)
+        # Colunas internas para a quantidade e a unidade ficarem compactas lado a lado dentro do card
+        col_qtd, col_unid = st.columns([2, 1])
         
         with col_qtd:
             qtd = st.number_input(f"Qtd {i}", min_value=0, step=1, key=f"qtd_{i}", label_visibility="collapsed")
@@ -95,8 +104,8 @@ with st.form("form_pedido"):
         with col_unid:
             unidade = st.selectbox(f"Unid {i}", ["CXS", "UNI"], key=f"unid_{i}", label_visibility="collapsed")
             
-        # Linha divisória sutil entre os produtos para facilitar a leitura rápida no celular
-        st.markdown("<hr style='margin: 5px 0 15px 0; border: none; border-top: 1px solid #EEE;'>", unsafe_allow_html=True)
+        # Fecha a div do card
+        st.markdown("</div>", unsafe_allow_html=True)
             
         if qtd > 0:
             itens_pedido.append({

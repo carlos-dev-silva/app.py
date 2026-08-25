@@ -5,19 +5,21 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime
 
-# 1. Configuração visual e layout limpo para celular
-st.set_page_config(page_title="Emissão de Pedido", layout="centered")
+# 1. Configuração visual forçando tema claro corporativo e fontes legíveis
+st.set_page_config(page_title="Contagem de Panettone", layout="centered")
 st.markdown("""
     <style>
+        /* Força fundo branco e texto escuro em qualquer celular (ignora o modo escuro do aparelho) */
         .stApp {
-            background-color: #F8F9FA; 
-            font-family: 'Bahnschrift', 'Eurostile', sans-serif;
-            color: #333333;
+            background-color: #F8F9FA !important; 
+            color: #212529 !important;
+            font-family: 'Bahnschrift', 'Segoe UI', sans-serif;
         }
-        /* Faixa creme de fundo do título */
+        
+        /* Cabeçalho do Título */
         .title-box {
             background-color: #FCF9F2;
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
             text-align: center;
@@ -25,32 +27,51 @@ st.markdown("""
         }
         .title-box h1 {
             margin: 0;
-            font-size: 22px;
-            color: #2C3338;
+            font-size: 20px !important;
+            color: #2C3338 !important;
         }
-        /* Card individual para cada produto (organiza o visual no celular) */
+
+        /* Card individual do produto */
         .produto-card {
             background-color: #FFFFFF;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #E0E0E0;
-            margin-bottom: 12px;
-            box-shadow: 0px 2px 4px rgba(0,0,0,0.02);
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #D6D8DB;
+            margin-bottom: 10px;
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
         }
+
+        /* Texto do produto dentro do card */
+        .produto-nome {
+            font-size: 11px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        /* Força os inputs de texto (Cliente e Razão) a ficarem legíveis com fundo branco */
+        input[type="text"] {
+            background-color: #FFFFFF !important;
+            color: #212529 !important;
+            border: 1px solid #CED4DA !important;
+        }
+
         div[data-testid="stForm"] {
             border: none;
             padding: 0;
             background: transparent;
         }
-        /* Botão vermelho de destaque ocupando toda a largura */
+
+        /* Botão de envio fixo e destacado */
         button[kind="primary"] {
             background-color: #FF4D4D !important;
             border-color: #FF4D4D !important;
             color: white !important;
             font-weight: bold;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
+            font-size: 16px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -78,24 +99,21 @@ produtos_fixos = [
 # 3. Construção do Formulário
 with st.form("form_pedido"):
     
-    # Cabeçalho do Cliente
     cod_cliente = st.text_input("Código do Cliente")
     razao = st.text_input("Razão Social do Cliente")
         
-    st.markdown("<p style='margin-top: 20px; font-weight: bold; color: #555;'>Itens da Contagem:</p>", unsafe_allow_html=True)
+    st.markdown("<p style='margin-top: 15px; font-weight: bold; color: #495057; font-size: 14px;'>Itens da Contagem:</p>", unsafe_allow_html=True)
     
     itens_pedido = []
     
     for i, prod in enumerate(produtos_fixos):
-        # Abre um "card" limpo em HTML para cada produto
+        # Abre o card HTML limpo
         st.markdown(f"""
             <div class="produto-card">
-                <div style="font-size: 13px; font-weight: bold; color: #222; margin-bottom: 8px;">
-                    {prod['cod']} - {prod['desc']}
-                </div>
+                <div class="produto-nome">{prod['cod']} - {prod['desc']}</div>
         """, unsafe_allow_html=True)
         
-        # Colunas internas para a quantidade e a unidade ficarem compactas lado a lado dentro do card
+        # Colunas LADO A LADO dentro do card: Qtd (maior) e Unidade (menor)
         col_qtd, col_unid = st.columns([2, 1])
         
         with col_qtd:
@@ -104,7 +122,6 @@ with st.form("form_pedido"):
         with col_unid:
             unidade = st.selectbox(f"Unid {i}", ["CXS", "UNI"], key=f"unid_{i}", label_visibility="collapsed")
             
-        # Fecha a div do card
         st.markdown("</div>", unsafe_allow_html=True)
             
         if qtd > 0:

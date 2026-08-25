@@ -5,7 +5,7 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime
 
-# 1. Configuração visual e CSS para compactar as caixas de input
+# 1. Configuração visual e CSS para alinhar perfeitamente no celular
 st.set_page_config(page_title="Contagem de Panettone", layout="centered")
 st.markdown("""
     <style>
@@ -29,12 +29,16 @@ st.markdown("""
             color: #2C3338 !important;
         }
 
-        .produto-linha {
-            font-size: 12px;
+        /* Caixa de contorno limpa para o nome do produto (igualzinho à sua foto) */
+        .produto-box {
+            background-color: #FFFFFF;
+            border: 1px solid #D6D8DB;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #333333;
-            margin-bottom: 2px;
-            margin-top: 10px;
+            margin-bottom: 4px;
         }
 
         div[data-testid="stForm"] {
@@ -43,17 +47,9 @@ st.markdown("""
             background: transparent;
         }
 
-        /* TORNA OS INPUTS COMPACTOS E SUAVES */
-        div[data-baseweb="input"] input, div[data-baseweb="select"] {
-            min-height: 35px !important;
-            height: 35px !important;
-            font-size: 14px !important;
-        }
-
-        /* Reduz a altura dos seletores e campos numéricos */
-        .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
-            padding-top: 0px !important;
-            padding-bottom: 0px !important;
+        /* Compacta os inputs para remover espaçamentos verticais excedentes */
+        div.row-widget.stHorizontal {
+            gap: 8px !important;
         }
 
         /* Botão de envio vermelho */
@@ -102,20 +98,25 @@ with st.form("form_pedido"):
     itens_pedido = []
     
     for i, prod in enumerate(produtos_fixos):
-        # Nome do produto limpo
-        st.markdown(f"<div class='produto-linha'>{prod['cod']} - {prod['desc']}</div>", unsafe_allow_html=True)
+        # Caixa de texto estática simulando o container da sua imagem
+        st.markdown(f"<div class='produto-box'>{prod['cod']} - {prod['desc']}</div>", unsafe_allow_html=True)
         
-        # Proporção ajustada: Quantidade (1 parte) | Unidade (1 parte) | Espaço vazio para alinhar (1 parte)
-        col_qtd, col_unid, col_vazia = st.columns([1, 1, 1])
+        # Colunas estritamente lado a lado para Qtd e Unidade
+        col_qtd, col_unid = st.columns(2)
         
         with col_qtd:
-            qtd = st.number_input(f"Qtd {i}", min_value=0, step=1, key=f"qtd_{i}", label_visibility="collapsed")
+            qtd_str = st.text_input(f"Qtd {i}", value="0", key=f"qtd_{i}", label_visibility="collapsed")
             
         with col_unid:
             unidade = st.selectbox(f"Unid {i}", ["CXS", "UNI"], key=f"unid_{i}", label_visibility="collapsed")
             
-        # Linha divisória sutil
-        st.markdown("<hr style='margin: 6px 0 10px 0; border: none; border-top: 1px solid #D6D8DB;'>", unsafe_allow_html=True)
+        # Espaçamento sutil entre os produtos
+        st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
+            
+        try:
+            qtd = int(qtd_str)
+        except ValueError:
+            qtd = 0
             
         if qtd > 0:
             itens_pedido.append({

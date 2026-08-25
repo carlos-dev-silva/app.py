@@ -5,55 +5,36 @@ import smtplib
 from email.message import EmailMessage
 from datetime import datetime
 
-# 1. Configuração visual forçando tema claro corporativo e fontes legíveis
+# 1. Configuração visual e CSS para compactar as caixas de input
 st.set_page_config(page_title="Contagem de Panettone", layout="centered")
 st.markdown("""
     <style>
-        /* Força fundo branco e texto escuro em qualquer celular (ignora o modo escuro do aparelho) */
         .stApp {
             background-color: #F8F9FA !important; 
             color: #212529 !important;
             font-family: 'Bahnschrift', 'Segoe UI', sans-serif;
         }
         
-        /* Cabeçalho do Título */
         .title-box {
             background-color: #FCF9F2;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
             text-align: center;
             border: 1px solid #EAE3D2;
         }
         .title-box h1 {
             margin: 0;
-            font-size: 20px !important;
+            font-size: 18px !important;
             color: #2C3338 !important;
         }
 
-        /* Card individual do produto */
-        .produto-card {
-            background-color: #FFFFFF;
-            padding: 10px 12px;
-            border-radius: 6px;
-            border: 1px solid #D6D8DB;
-            margin-bottom: 10px;
-            box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
-        }
-
-        /* Texto do produto dentro do card */
-        .produto-nome {
-            font-size: 11px;
+        .produto-linha {
+            font-size: 12px;
             font-weight: bold;
-            color: #495057;
-            margin-bottom: 6px;
-        }
-
-        /* Força os inputs de texto (Cliente e Razão) a ficarem legíveis com fundo branco */
-        input[type="text"] {
-            background-color: #FFFFFF !important;
-            color: #212529 !important;
-            border: 1px solid #CED4DA !important;
+            color: #333333;
+            margin-bottom: 2px;
+            margin-top: 10px;
         }
 
         div[data-testid="stForm"] {
@@ -62,7 +43,20 @@ st.markdown("""
             background: transparent;
         }
 
-        /* Botão de envio fixo e destacado */
+        /* TORNA OS INPUTS COMPACTOS E SUAVES */
+        div[data-baseweb="input"] input, div[data-baseweb="select"] {
+            min-height: 35px !important;
+            height: 35px !important;
+            font-size: 14px !important;
+        }
+
+        /* Reduz a altura dos seletores e campos numéricos */
+        .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+
+        /* Botão de envio vermelho */
         button[kind="primary"] {
             background-color: #FF4D4D !important;
             border-color: #FF4D4D !important;
@@ -71,7 +65,8 @@ st.markdown("""
             width: 100%;
             padding: 12px;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 15px;
+            margin-top: 15px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -102,19 +97,16 @@ with st.form("form_pedido"):
     cod_cliente = st.text_input("Código do Cliente")
     razao = st.text_input("Razão Social do Cliente")
         
-    st.markdown("<p style='margin-top: 15px; font-weight: bold; color: #495057; font-size: 14px;'>Itens da Contagem:</p>", unsafe_allow_html=True)
+    st.markdown("<p style='margin-top: 15px; font-weight: bold; color: #495057; font-size: 13px;'>Itens da Contagem:</p>", unsafe_allow_html=True)
     
     itens_pedido = []
     
     for i, prod in enumerate(produtos_fixos):
-        # Abre o card HTML limpo
-        st.markdown(f"""
-            <div class="produto-card">
-                <div class="produto-nome">{prod['cod']} - {prod['desc']}</div>
-        """, unsafe_allow_html=True)
+        # Nome do produto limpo
+        st.markdown(f"<div class='produto-linha'>{prod['cod']} - {prod['desc']}</div>", unsafe_allow_html=True)
         
-        # Colunas LADO A LADO dentro do card: Qtd (maior) e Unidade (menor)
-        col_qtd, col_unid = st.columns([2, 1])
+        # Proporção ajustada: Quantidade (1 parte) | Unidade (1 parte) | Espaço vazio para alinhar (1 parte)
+        col_qtd, col_unid, col_vazia = st.columns([1, 1, 1])
         
         with col_qtd:
             qtd = st.number_input(f"Qtd {i}", min_value=0, step=1, key=f"qtd_{i}", label_visibility="collapsed")
@@ -122,7 +114,8 @@ with st.form("form_pedido"):
         with col_unid:
             unidade = st.selectbox(f"Unid {i}", ["CXS", "UNI"], key=f"unid_{i}", label_visibility="collapsed")
             
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Linha divisória sutil
+        st.markdown("<hr style='margin: 6px 0 10px 0; border: none; border-top: 1px solid #D6D8DB;'>", unsafe_allow_html=True)
             
         if qtd > 0:
             itens_pedido.append({

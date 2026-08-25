@@ -7,70 +7,67 @@ from datetime import datetime
 
 
 # ============================================================
-# CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO
 # ============================================================
 
 st.set_page_config(
     page_title="Contagem de Panettone",
     page_icon="📦",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    layout="centered"
 )
 
 
 # ============================================================
-# CSS - VISUAL MOBILE
+# CSS
 # ============================================================
 
 st.markdown("""
 <style>
 
-    /* ========================================================
-       CONFIGURAÇÃO GERAL
-       ======================================================== */
+    /* ======================================================
+       PÁGINA
+       ====================================================== */
 
     .stApp {
-        background-color: #F8F9FA !important;
+        background: #F5F6F8 !important;
         color: #212529 !important;
-        font-family: 'Segoe UI', Arial, sans-serif;
+        font-family: Arial, sans-serif !important;
     }
 
     .block-container {
-        padding-top: 15px !important;
-        padding-bottom: 20px !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-        max-width: 600px !important;
+        max-width: 620px !important;
+        padding: 15px 12px 30px 12px !important;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        TÍTULO
-       ======================================================== */
+       ====================================================== */
 
-    .title-box {
-        background-color: #FCF9F2;
+    .titulo {
+        background: #FCF9F2;
+        border: 1px solid #E8E0D0;
+        border-radius: 7px;
         padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 15px;
         text-align: center;
-        border: 1px solid #EAE3D2;
+        margin-bottom: 14px;
     }
 
-    .title-box h1 {
-        margin: 0;
+    .titulo h1 {
+        margin: 0 !important;
+        padding: 0 !important;
         font-size: 18px !important;
-        color: #2C3338 !important;
-        font-weight: 700;
+        color: #30353A !important;
+        font-weight: 700 !important;
     }
 
 
-    /* ========================================================
-       CAMPOS CLIENTE
-       ======================================================== */
+    /* ======================================================
+       CAMPOS DO CLIENTE
+       ====================================================== */
 
     div[data-testid="stTextInput"] {
-        margin-bottom: 5px !important;
+        margin-bottom: 8px !important;
     }
 
     div[data-testid="stTextInput"] label {
@@ -90,205 +87,293 @@ st.markdown("""
     }
 
 
-    /* ========================================================
-       TEXTO "ITENS DA CONTAGEM"
-       ======================================================== */
+    /* ======================================================
+       TÍTULO ITENS
+       ====================================================== */
 
     .itens-titulo {
-        margin-top: 15px;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #495057;
+        margin-top: 14px;
+        margin-bottom: 7px;
         font-size: 13px;
+        font-weight: 700;
+        color: #495057;
     }
 
 
-    /* ========================================================
-       PRODUTO
-       ======================================================== */
+    /* ======================================================
+       CAIXA DO PRODUTO
+       ====================================================== */
 
-    .produto-box {
-        background-color: #FFFFFF;
+    .produto {
+        width: 100%;
+        box-sizing: border-box;
+
+        background: #FFFFFF;
+
         border: 1px solid #D6D8DB;
         border-radius: 6px;
-        padding: 10px 12px;
-        font-size: 11px;
-        font-weight: 600;
-        color: #333333;
+
+        padding: 9px 11px;
+
+        margin-top: 5px;
         margin-bottom: 3px;
+
+        font-size: 11px;
         line-height: 1.3;
-        box-sizing: border-box;
-        width: 100%;
+
+        color: #333333;
+        font-weight: 600;
+
+        overflow: hidden;
+        word-break: normal;
     }
 
 
-    /* ========================================================
-       COLUNAS - FORÇA QTD + UNIDADE LADO A LADO
-       ======================================================== */
+    /* ======================================================
+       CONTAINER DA LINHA
+       
+       ESTA É A PARTE MAIS IMPORTANTE.
+       
+       Cada container de produto vira:
+       
+       [ QUANTIDADE ] [ UNIDADE ]
+       
+       usando CSS GRID.
+       ====================================================== */
 
-    div[data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 6px !important;
+    div[class*="st-key-produto_linha_"] {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        column-gap: 6px !important;
+
         width: 100% !important;
-        align-items: stretch !important;
-    }
 
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-        min-width: 0 !important;
-        width: 50% !important;
-        flex: 1 1 50% !important;
+        margin: 0 !important;
         padding: 0 !important;
+
+        box-sizing: border-box !important;
     }
 
 
-    /* ========================================================
-       INPUT DE QUANTIDADE
-       ======================================================== */
+    /* ======================================================
+       WIDGETS DENTRO DA LINHA
+       ====================================================== */
 
-    div[data-testid="stHorizontalBlock"] div[data-testid="stTextInput"] {
+    div[class*="st-key-produto_linha_"] > div {
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+
+    /* ======================================================
+       INPUT DE QUANTIDADE
+       ====================================================== */
+
+    div[class*="st-key-produto_linha_"]
+    div[data-testid="stTextInput"] {
+
+        width: 100% !important;
+
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    div[data-testid="stHorizontalBlock"] div[data-testid="stTextInput"] label {
+    div[class*="st-key-produto_linha_"]
+    div[data-testid="stTextInput"] label {
+
         display: none !important;
     }
 
-    div[data-testid="stHorizontalBlock"] div[data-testid="stTextInput"] input {
+    div[class*="st-key-produto_linha_"]
+    div[data-testid="stTextInput"] input {
+
         width: 100% !important;
+
         height: 40px !important;
         min-height: 40px !important;
+
         box-sizing: border-box !important;
 
-        background-color: #F1F3F5 !important;
-        border: 1px solid #E0E3E6 !important;
+        background: #EEF1F4 !important;
+
+        border: 1px solid #DDE1E5 !important;
         border-radius: 5px !important;
 
-        font-size: 13px !important;
         color: #333333 !important;
+
+        font-size: 13px !important;
 
         padding: 8px 10px !important;
     }
 
 
-    /* ========================================================
-       SELECTBOX - UNIDADE
-       ======================================================== */
+    /* ======================================================
+       SELECTBOX
+       ====================================================== */
 
-    div[data-testid="stHorizontalBlock"] div[data-testid="stSelectbox"] {
+    div[class*="st-key-produto_linha_"]
+    div[data-testid="stSelectbox"] {
+
+        width: 100% !important;
+
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    div[data-testid="stHorizontalBlock"] div[data-testid="stSelectbox"] label {
+    div[class*="st-key-produto_linha_"]
+    div[data-testid="stSelectbox"] label {
+
         display: none !important;
     }
 
-    div[data-testid="stHorizontalBlock"] div[data-baseweb="select"] {
+    div[class*="st-key-produto_linha_"]
+    div[data-baseweb="select"] {
+
         width: 100% !important;
-        min-height: 40px !important;
+
         height: 40px !important;
+        min-height: 40px !important;
     }
 
-    div[data-testid="stHorizontalBlock"] div[data-baseweb="select"] > div {
-        min-height: 40px !important;
-        height: 40px !important;
+    div[class*="st-key-produto_linha_"]
+    div[data-baseweb="select"] > div {
 
-        background-color: #F1F3F5 !important;
-        border: 1px solid #E0E3E6 !important;
+        height: 40px !important;
+        min-height: 40px !important;
+
+        box-sizing: border-box !important;
+
+        background: #EEF1F4 !important;
+
+        border: 1px solid #DDE1E5 !important;
         border-radius: 5px !important;
 
         font-size: 13px !important;
+
         color: #333333 !important;
     }
 
 
-    /* ========================================================
-       FORMULÁRIO
-       ======================================================== */
+    /* ======================================================
+       FORM
+       ====================================================== */
 
     div[data-testid="stForm"] {
+
         border: none !important;
+
         padding: 0 !important;
+
         background: transparent !important;
     }
 
 
-    /* ========================================================
-       ESPAÇAMENTO ENTRE PRODUTOS
-       ======================================================== */
+    /* ======================================================
+       ESPAÇAMENTO
+       ====================================================== */
 
-    .produto-espaco {
-        height: 12px;
+    .espaco-produto {
+        height: 11px;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        BOTÃO
-       ======================================================== */
+       ====================================================== */
 
     button[kind="primary"] {
-        background-color: #FF4D4D !important;
-        border-color: #FF4D4D !important;
-        color: white !important;
-        font-weight: bold !important;
+
         width: 100% !important;
+
         min-height: 46px !important;
-        padding: 10px !important;
+
+        margin-top: 10px !important;
+
         border-radius: 6px !important;
+
+        background: #FF4D4D !important;
+
+        border: 1px solid #FF4D4D !important;
+
+        color: white !important;
+
         font-size: 15px !important;
-        margin-top: 12px !important;
+
+        font-weight: 700 !important;
     }
 
     button[kind="primary"]:hover {
-        background-color: #E63946 !important;
-        border-color: #E63946 !important;
+
+        background: #E94343 !important;
+
+        border-color: #E94343 !important;
     }
 
 
-    /* ========================================================
-       MENSAGENS
-       ======================================================== */
+    /* ======================================================
+       CELULAR
+       
+       Não deixa a linha quebrar.
+       ====================================================== */
 
-    div[data-testid="stAlert"] {
-        font-size: 13px !important;
-        border-radius: 6px !important;
-    }
-
-
-    /* ========================================================
-       MOBILE
-       ======================================================== */
-
-    @media (max-width: 600px) {
+    @media screen and (max-width: 600px) {
 
         .block-container {
+
+            width: 100% !important;
+
+            max-width: 100% !important;
+
             padding-left: 8px !important;
             padding-right: 8px !important;
+
             padding-top: 10px !important;
         }
 
-        .title-box {
-            margin-bottom: 12px;
-        }
 
-        .title-box h1 {
+        .titulo h1 {
             font-size: 17px !important;
         }
 
-        .produto-box {
+
+        .produto {
+
             font-size: 10.5px !important;
+
             padding: 9px 10px !important;
+
+            white-space: normal !important;
         }
 
-        div[data-testid="stHorizontalBlock"] {
-            gap: 5px !important;
+
+        /*
+         * Continua 50% / 50%
+         */
+        div[class*="st-key-produto_linha_"] {
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(0, 1fr) !important;
+
+            column-gap: 5px !important;
         }
 
-        div[data-testid="stHorizontalBlock"] input,
-        div[data-testid="stHorizontalBlock"] [data-baseweb="select"] {
+
+        div[class*="st-key-produto_linha_"]
+        input {
+
+            font-size: 12px !important;
+        }
+
+
+        div[class*="st-key-produto_linha_"]
+        div[data-baseweb="select"] {
+
             font-size: 12px !important;
         }
 
@@ -303,53 +388,63 @@ st.markdown("""
 # ============================================================
 
 st.markdown("""
-<div class="title-box">
+<div class="titulo">
     <h1>📦 Contagem de Panettone</h1>
 </div>
 """, unsafe_allow_html=True)
 
 
 # ============================================================
-# LISTA FIXA DE PRODUTOS
+# PRODUTOS
 # ============================================================
 
 produtos_fixos = [
+
     {
         "cod": "8732089",
         "desc": "PANETTONE TOMMY FRUTAS 400G"
     },
+
     {
         "cod": "8732090",
         "desc": "PANETTONE TOMMY GOTAS 400G"
     },
+
     {
         "cod": "8732091",
         "desc": "PANETTONE VISCONTI FRUTAS 400G"
     },
+
     {
         "cod": "8732092",
         "desc": "PANETTONE VISCONTI GOTAS 400G"
     },
+
     {
         "cod": "8732093",
         "desc": "PANETTONE VISCONTI TRUFADO 450G"
     },
+
     {
         "cod": "8732094",
         "desc": "PANETTONE VISCONTI MAIS CHOCOLAT"
     },
+
     {
         "cod": "8732095",
         "desc": "PANETTONE VISCONTI DOCE DE LEITE"
     },
+
     {
         "cod": "8732096",
         "desc": "PANETTONE VISCONTI FRUTAS 680G"
     },
+
     {
         "cod": "8732097",
         "desc": "PANETTONE VISCONTI GOTAS 680G"
     }
+
 ]
 
 
@@ -359,13 +454,13 @@ produtos_fixos = [
 
 with st.form("form_pedido"):
 
-    # --------------------------------------------------------
-    # DADOS DO CLIENTE
-    # --------------------------------------------------------
+    # ========================================================
+    # CLIENTE
+    # ========================================================
 
     cod_cliente = st.text_input(
         "Código do Cliente",
-        placeholder="Digite o código do cliente"
+        placeholder="Digite o código"
     )
 
     razao = st.text_input(
@@ -374,9 +469,9 @@ with st.form("form_pedido"):
     )
 
 
-    # --------------------------------------------------------
-    # TÍTULO DOS PRODUTOS
-    # --------------------------------------------------------
+    # ========================================================
+    # TÍTULO
+    # ========================================================
 
     st.markdown(
         "<div class='itens-titulo'>Itens da Contagem:</div>",
@@ -384,21 +479,24 @@ with st.form("form_pedido"):
     )
 
 
-    # Lista que receberá os produtos preenchidos
     itens_pedido = []
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # PRODUTOS
-    # --------------------------------------------------------
+    # ========================================================
 
     for i, prod in enumerate(produtos_fixos):
 
-        # Caixa do produto
+
+        # ----------------------------------------------------
+        # PRODUTO
+        # ----------------------------------------------------
+
         st.markdown(
             f"""
-            <div class="produto-box">
-                {prod['cod']} - {prod['desc']}
+            <div class="produto">
+                {prod["cod"]} - {prod["desc"]}
             </div>
             """,
             unsafe_allow_html=True
@@ -406,38 +504,45 @@ with st.form("form_pedido"):
 
 
         # ----------------------------------------------------
-        # QUANTIDADE + UNIDADE
-        # SEMPRE LADO A LADO
+        # LINHA QTD + UNIDADE
+        #
+        # NÃO usamos st.columns aqui.
+        #
+        # O container recebe uma chave única:
+        #
+        # produto_linha_0
+        # produto_linha_1
+        # etc.
+        #
+        # O CSS transforma o container em GRID.
         # ----------------------------------------------------
 
-        col_qtd, col_unid = st.columns(
-            [1, 1],
-            gap="small"
+        linha = st.container(
+            key=f"produto_linha_{i}"
         )
 
 
-        # ----------------------------------------------------
-        # QUANTIDADE
-        # ----------------------------------------------------
+        with linha:
 
-        with col_qtd:
+
+            # -----------------------------------------------
+            # QUANTIDADE
+            # -----------------------------------------------
 
             qtd_str = st.text_input(
-                f"Qtd {i}",
+                f"Quantidade {i}",
                 value="0",
                 key=f"qtd_{i}",
                 label_visibility="collapsed"
             )
 
 
-        # ----------------------------------------------------
-        # UNIDADE
-        # ----------------------------------------------------
-
-        with col_unid:
+            # -----------------------------------------------
+            # UNIDADE
+            # -----------------------------------------------
 
             unidade = st.selectbox(
-                f"Unid {i}",
+                f"Unidade {i}",
                 ["CXS", "UNI"],
                 key=f"unid_{i}",
                 label_visibility="collapsed"
@@ -445,32 +550,43 @@ with st.form("form_pedido"):
 
 
         # ----------------------------------------------------
-        # CONVERTE QUANTIDADE
+        # QUANTIDADE
         # ----------------------------------------------------
 
         try:
+
             qtd = int(qtd_str)
+
         except (ValueError, TypeError):
+
             qtd = 0
 
 
         # ----------------------------------------------------
-        # ADICIONA SOMENTE PRODUTOS COM QUANTIDADE
+        # ADICIONA PRODUTO
         # ----------------------------------------------------
 
         if qtd > 0:
 
             itens_pedido.append({
+
                 "Cod_Produto": prod["cod"],
+
                 "Produto": prod["desc"],
+
                 "Quantidade": qtd,
+
                 "Unidade": unidade
+
             })
 
 
-        # Espaçamento
+        # ----------------------------------------------------
+        # ESPAÇO
+        # ----------------------------------------------------
+
         st.markdown(
-            "<div class='produto-espaco'></div>",
+            "<div class='espaco-produto'></div>",
             unsafe_allow_html=True
         )
 
@@ -487,14 +603,15 @@ with st.form("form_pedido"):
 
 
 # ============================================================
-# PROCESSAMENTO DO PEDIDO
+# ENVIO
 # ============================================================
 
 if submit:
 
-    # --------------------------------------------------------
-    # VALIDAÇÃO DO CLIENTE
-    # --------------------------------------------------------
+
+    # ========================================================
+    # VALIDAÇÃO
+    # ========================================================
 
     if not cod_cliente or not razao:
 
@@ -503,10 +620,6 @@ if submit:
         )
 
 
-    # --------------------------------------------------------
-    # VALIDAÇÃO DOS PRODUTOS
-    # --------------------------------------------------------
-
     elif len(itens_pedido) == 0:
 
         st.warning(
@@ -514,22 +627,23 @@ if submit:
         )
 
 
-    # --------------------------------------------------------
-    # GERA PEDIDO
-    # --------------------------------------------------------
-
     else:
 
-        dados_planilha = []
+
+        # ====================================================
+        # DATA
+        # ====================================================
 
         data_atual = datetime.now().strftime(
             "%d/%m/%Y %H:%M"
         )
 
 
-        # ----------------------------------------------------
-        # MONTA DADOS DA PLANILHA
-        # ----------------------------------------------------
+        # ====================================================
+        # DADOS DA PLANILHA
+        # ====================================================
+
+        dados_planilha = []
 
         for item in itens_pedido:
 
@@ -552,16 +666,18 @@ if submit:
             })
 
 
-        # ----------------------------------------------------
+        # ====================================================
         # DATAFRAME
-        # ----------------------------------------------------
+        # ====================================================
 
-        df = pd.DataFrame(dados_planilha)
+        df = pd.DataFrame(
+            dados_planilha
+        )
 
 
-        # ----------------------------------------------------
-        # CRIA EXCEL NA MEMÓRIA
-        # ----------------------------------------------------
+        # ====================================================
+        # EXCEL
+        # ====================================================
 
         buffer = io.BytesIO()
 
@@ -581,13 +697,9 @@ if submit:
 
 
         # ====================================================
-        # CONFIGURAÇÃO DO E-MAIL
-        # ====================================================
+        # E-MAIL
         #
-        # IMPORTANTE:
-        # Substitua os três valores abaixo.
-        #
-        # Para Gmail, use uma SENHA DE APP.
+        # TROQUE ESTES DADOS
         # ====================================================
 
         EMAIL_REMETENTE = "seu_email_robo@gmail.com"
@@ -597,16 +709,18 @@ if submit:
         EMAIL_DESTINO = "seu_email_pessoal@dominio.com"
 
 
-        # ----------------------------------------------------
-        # MONTA E-MAIL
-        # ----------------------------------------------------
+        # ====================================================
+        # MENSAGEM
+        # ====================================================
 
         msg = EmailMessage()
+
 
         msg["Subject"] = (
             f"Contagem - Cliente: "
             f"{cod_cliente} ({razao})"
         )
+
 
         msg["From"] = EMAIL_REMETENTE
 
@@ -615,22 +729,22 @@ if submit:
 
         msg.set_content(
             f"""
-Segue em anexo a contagem do cliente.
+Segue em anexo a contagem.
 
 Código do Cliente: {cod_cliente}
 
 Razão Social: {razao}
 
-Quantidade de produtos preenchidos: {len(itens_pedido)}
+Produtos preenchidos: {len(itens_pedido)}
 
 Data: {data_atual}
 """
         )
 
 
-        # ----------------------------------------------------
-        # NOME DO ARQUIVO
-        # ----------------------------------------------------
+        # ====================================================
+        # ARQUIVO
+        # ====================================================
 
         nome_arquivo = (
             f"Contagem_"
@@ -640,23 +754,22 @@ Data: {data_atual}
         )
 
 
-        # ----------------------------------------------------
-        # ANEXA EXCEL
-        # ----------------------------------------------------
-
         msg.add_attachment(
             excel_data,
+
             maintype="application",
+
             subtype=(
                 "vnd.openxmlformats-officedocument"
                 ".spreadsheetml.sheet"
             ),
+
             filename=nome_arquivo
         )
 
 
         # ====================================================
-        # ENVIA E-MAIL
+        # ENVIO
         # ====================================================
 
         try:
@@ -673,10 +786,6 @@ Data: {data_atual}
 
                 smtp.send_message(msg)
 
-
-            # ------------------------------------------------
-            # SUCESSO
-            # ------------------------------------------------
 
             st.success(
                 "✅ Contagem enviada com sucesso!"
